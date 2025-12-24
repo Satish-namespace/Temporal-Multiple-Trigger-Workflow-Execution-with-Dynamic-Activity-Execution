@@ -44,7 +44,7 @@ python multiple_trigger_app.py
 ## Flask API - API Request Trigger
 - Used multiple_trigger_app.py Flask API app to simulate the POST request
 ```bash
-curl -X POST https://localhost:Flask_App_Port      -H "Content-Type: application/json"      -d '{
+curl -X POST https://localhost:{Flask_App_Port}/trigger      -H "Content-Type: application/json"      -d '{
            "workflow_id": "user_workflow_1",
            "trigger_payload": {
                "trigger": "api_trigger",
