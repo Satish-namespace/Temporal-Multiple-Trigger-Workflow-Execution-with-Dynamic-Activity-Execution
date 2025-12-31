@@ -9,28 +9,29 @@ async def main():
     workflow_id = "user_workflow_1"
     task_queue = "dynamic-task-queue"
 
-    while True:
-        now = datetime.now()
-        print(f"[{now}] Sending scheduled trigger...")
+    # while True:
+    now = datetime.now()
+    print(f"[{now}] Sending scheduled trigger...")
 
-        try:
-            await client.start_workflow(
-                MultiTriggerDynamicWorkflow,
-                id=workflow_id,
-                task_queue=task_queue,
-            )
-            print("Workflow started successfully.")
-        except WorkflowAlreadyStartedError:
-            print("Workflow already running, sending signal instead.")
-        trigger_payload = {
-            "trigger": "scheduled_trigger",
-            "activities": ["activity_e", "activity_c", "activity_d"]
-        }
+    try:
+        await client.start_workflow(
+            MultiTriggerDynamicWorkflow,
+            id=workflow_id,
+            task_queue=task_queue,
+        )
+        print("Workflow started successfully.")
+    except WorkflowAlreadyStartedError:
+        print("Workflow already running, sending signal instead.")
+    trigger_payload = {
+        "trigger": "scheduled_trigger",
+        "cron": "*/1 * * * *",
+        "activities": ["activity_e", "activity_c", "activity_d"]
+    }
 
-        workflow_handle = client.get_workflow_handle(workflow_id)
-        await workflow_handle.signal(MultiTriggerDynamicWorkflow.scheduled_trigger, trigger_payload)
+    workflow_handle = client.get_workflow_handle(workflow_id)
+    await workflow_handle.signal(MultiTriggerDynamicWorkflow.scheduled_trigger, trigger_payload)
 
-        await asyncio.sleep(15) 
+    # await asyncio.sleep(15) 
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,5 +1,5 @@
 from temporalio.worker import Worker
-from workflow import SingleTriggerDynamicWorkflow
+# from workflow import SingleTriggerDynamicWorkflow
 from temporalio.client import Client
 from activities import activity_a, activity_b, activity_c, activity_d, activity_e, report_result
 from multiple_trigger_dynamic_workflow import MultiTriggerDynamicWorkflow

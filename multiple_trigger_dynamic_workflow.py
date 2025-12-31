@@ -1,7 +1,8 @@
 from temporalio import workflow
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import Dict, Any
 from trigger_execution_workflow import TriggerExecutionWorkflow
+from temporalio.workflow import ParentClosePolicy
 
 @workflow.defn
 class MultiTriggerDynamicWorkflow:
@@ -29,11 +30,22 @@ class MultiTriggerDynamicWorkflow:
 
             while self._queue:
                 payload = self._queue.pop(0)
-
-                await workflow.execute_child_workflow(
-                    TriggerExecutionWorkflow.run,
-                    payload,
-                    id=f"{workflow.info().workflow_id}:{workflow.now()}",
-                    task_queue="dynamic-task-queue",
-                    run_timeout=timedelta(minutes=5)
-                )
+                check = payload.get('cron')
+                workflow.logger.info(f"DEBUG: CRON VALUE: {check}")
+                if check:
+                    await workflow.start_child_workflow(
+                        TriggerExecutionWorkflow.run,
+                        payload,
+                        id=f"{workflow.info().workflow_id}:{workflow.now()}",
+                        task_queue="dynamic-task-queue",
+                        cron_schedule=check,
+                        parent_close_policy=ParentClosePolicy.ABANDON
+                    )
+                else:
+                    await workflow.execute_child_workflow(
+                        TriggerExecutionWorkflow.run,
+                        payload,
+                        id=f"{workflow.info().workflow_id}:{workflow.now()}",
+                        task_queue="dynamic-task-queue",
+                        run_timeout=timedelta(minutes=5),
+                    )
