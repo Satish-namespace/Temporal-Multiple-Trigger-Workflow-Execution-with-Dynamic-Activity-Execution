@@ -30,15 +30,14 @@ class MultiTriggerDynamicWorkflow:
 
             while self._queue:
                 payload = self._queue.pop(0)
-                check = payload.get('cron')
-                workflow.logger.info(f"DEBUG: CRON VALUE: {check}")
-                if check:
+                cron_string = payload.get('cron')
+                if cron_string:
                     await workflow.start_child_workflow(
                         TriggerExecutionWorkflow.run,
                         payload,
                         id=f"{workflow.info().workflow_id}:{workflow.now()}",
                         task_queue="dynamic-task-queue",
-                        cron_schedule=check,
+                        cron_schedule=cron_string,
                         parent_close_policy=ParentClosePolicy.ABANDON
                     )
                 else:
